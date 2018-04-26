@@ -23,8 +23,9 @@ In the demo you can pan and zoom using the mouse and scroll wheel. In the demo y
 
 ## Dependencies
 
-All dependencies can be found in the js/ sub folder of the repo
+Most dependencies can be found in the js/ sub folder of the repo
 
+* Bower
 * numbers.js
 * Babylon 2.1
 * Cannon.js
