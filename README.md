@@ -9,7 +9,8 @@ This is an attempt to use native javascript libraries to build the basis of a ga
 This project can be downloaded and run directly from github. To do so please:
 
 1. Clone the repository.
-2. Open index.html in your WebGL compatible browser of choice.
+2. Run "bower install"
+3. Open index.html in your WebGL compatible browser of choice.
 
 In the demo you can pan and zoom using the mouse and scroll wheel. In the demo you should see a main body, a reference grid, and 2 nested orbiting bodies. You may need to zoom out to see the smaller bodies.
 
@@ -24,6 +25,7 @@ In the demo you can pan and zoom using the mouse and scroll wheel. In the demo y
 
 All dependencies can be found in the js/ sub folder of the repo
 
+* numbers.js
 * Babylon 2.1
 * Cannon.js
 * gl-matrix-64.js
