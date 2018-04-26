@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+   <head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<title>Babylon - Basic scene</title>
+		<style>
+			html, body {
+				overflow: hidden;
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				padding: 0;
+			}
+
+			#renderCanvas {
+				width: 100%;
+				height: 100%;
+				touch-action: none;
+			}
+
+			.debug-output {
+				position: fixed;
+				color: white;
+				top: 0px;
+				left: 0px;
+				padding: 5px;
+				background-color: rgba(255, 255, 255, 0.5);
+				z-index: 1;
+			}
+		</style>
+		<script src="js/babylon.2.1.js"></script>
+		<script src="js/hand-1.3.7.js"></script>
+		<script src="js/Oimo.js"></script> <!-- New physics engine -->
+      <script src="js/gl-matrix-min-64.js"></script>
+      <script src="bower_components/numbers.js/src/numbers.min.js"></script>
+      <script src="BallisticHawk.js"></script>
+   </head>
+
+   <body>
+   		<canvas id="renderCanvas"></canvas>
+   		<div class="debug-output">
+   			<span style="color: green; text-decoration: underline;"> Debug Output </span>
+   			<div>
+   				<span id="xPosOutput" style="color: #941100"></span> 
+   				<span id="yPosOutput" style="color: green"></span> 
+   				<span id="zPosOutput" style="color: blue"></span> 
+   				<span id="distOutput" style="color: white"></span>
+               (<span id="fpsOutput" style="color: #941100"></span> 
+               <span id="scaleOutput" style="color: green"></span> 
+               <span id="simRatioOutput" style="color: blue"></span>)
+   			</div>
+            <span style="color: green; text-decoration: underline;"> Controls </span>
+            <!--
+            <div>
+               W : Move Camera Center Y+ <br/>
+               A : Move Camera Center X- <br/>
+               S : Move Camera Center Y- <br/>
+               D : Move Camera Center X+ <br/>
+               Q : Move Camera Center Z+ <br/>
+               Z : Move Camera Center Z- <br/>
+               E : Move Display Scale + <br/>
+               C : Move Display Scale - <br/>
+            </div>
+            -->
+   		</div>
+   		<script type="text/javascript">
+
+
+
+            var fpsElement = document.getElementById('fpsOutput');
+            var scaleElement = document.getElementById('scaleOutput');
+            var simRatioOutput = document.getElementById('simRatioOutput');
+   			var canvas = document.getElementById("renderCanvas");
+   			var engine = new BABYLON.Engine(canvas, true);
+            var b = BABYLON;
+            var parentSystem = null;
+            var createScene = function () {
+               // Create Scene Object
+               var scene = new b.Scene(engine);
+               // Set Scene Background
+               scene.clearColor = new b.Color3(0.1,0.1,0.1);
+               // Create Player Camera
+               var camera = new BABYLON.ArcRotateCamera("ArcRotateCamera", (Math.PI), 0, 20, new BABYLON.Vector3(0, 0, 0), scene);
+               //var camera = new BABYLON.FreeCamera("FreeCamera", new BABYLON.Vector3(0, 10, -10), scene);
+               //Point Camera at Origin
+               //camera.setTarget(b.Vector3.Zero());
+               // Attach Camera to Canvas
+               camera.attachControl(canvas, false);
+               // Create Scene Light and Point Upwards
+               var light = new b.HemisphericLight("light1", new b.Vector3(0,0,10), scene);
+               // Dim the Light
+               light.intensity = 0.7;
+
+               var light2 = new b.HemisphericLight("light2", new b.Vector3(0,0,-10), scene);
+               // Dim the Light
+               light2.intensity = 0.7;
+
+
+               // Create Objects
+               createReferenceGrid(BABYLON, scene, [20,20]);
+               parentSystem = createTestParentSystem(BABYLON, scene);
+               return scene;
+            };
+
+            var createParentSystem = function (BABYLON,scene) {
+
+               var parentSystem = BallisticHawk.createSystem();
+               var subSystem = BallisticHawk.createSystem();
+               parentSystem.set('position',vec3.fromValues(0,0,0));
+               parentSystem.set('name',"parentSystem");
+               var testBody = BallisticHawk.createBody({name: "tb1", radius  : 1, mass : 1000000, position: vec3.fromValues(0,0,0)});
+               var test2Body = BallisticHawk.createBody({name: "tb2", radius  : 0.5, mass : 1, position: vec3.fromValues(1,0,0)});
+               var renderObject = BABYLON.Mesh.CreateSphere(testBody.name, 16, testBody.radius, scene);
+               var render2Object = BABYLON.Mesh.CreateSphere(test2Body.name, 16, test2Body.radius, scene);
+               testBody.renderObject = renderObject;
+               test2Body.renderObject = render2Object;
+               var renderUpdateFunction = function (position, object) {
+                  //console.log(position, object);
+                  if(typeof object.renderObject != 'undefined') {
+                     object.renderObject.position.x = position[0];
+                     object.renderObject.position.y = position[1];
+                     object.renderObject.position.z = position[2];
+                  }
+               };
+               parentSystem.set('renderUpdateFunction',renderUpdateFunction);
+               parentSystem.addBody(test2Body);
+               parentSystem.addBody(testBody);
+               return parentSystem;
+            };
+
+            var createTestParentSystem = function (BABYLON,scene) {
+
+               var parentSystem = BallisticHawk.createSystem();
+               var subSystem = BallisticHawk.createSystem();
+               
+               parentSystem.set('position',vec3.fromValues(0,0,0));
+               subSystem.set('position',vec3.fromValues(0,0,10));
+               parentSystem.set('name',"parentSystem");
+               parentSystem.set('isFixed',true);
+               subSystem.set('name',"subSystem");
+
+               var testBody = BallisticHawk.createBody({name: "tb1", radius  : 2, mass : 1000000, position: vec3.fromValues(0,0,0), isFixed: true});
+               var test2Body = BallisticHawk.createBody({name: "tb2", radius  : 1, mass : 1000000, position: vec3.fromValues(0,0,0)});
+               var test3Body = BallisticHawk.createBody({name: "tb3", radius  : 0.5, mass : 1, position: vec3.fromValues(2,0,0)});
+               
+               var renderObject = BABYLON.Mesh.CreateSphere(testBody.name, 16, testBody.radius, scene);
+               var render2Object = BABYLON.Mesh.CreateSphere(test2Body.name, 16, test2Body.radius, scene);
+               var render3Object = BABYLON.Mesh.CreateSphere(test2Body.name, 16, test3Body.radius, scene);
+               testBody.set('renderObject',renderObject);
+               test2Body.set('renderObject',render2Object);
+               test3Body.set('renderObject',render3Object);
+               subSystem.set('velocity', parentSystem.generateCircularOrbitalVector(subSystem, testBody, 1));
+               test3Body.set('velocity', parentSystem.generateCircularOrbitalVector(test3Body, test2Body, 1));
+               var renderUpdateFunction = function (position, object) {
+                  //console.log(position, object);
+                  if(typeof object.renderObject != 'undefined') {
+                     object.renderObject.position.x = position[0];
+                     object.renderObject.position.y = position[1];
+                     object.renderObject.position.z = position[2];
+                  }
+               };
+               parentSystem.set('renderUpdateFunction',renderUpdateFunction);
+               subSystem.set('renderUpdateFunction',renderUpdateFunction);
+               subSystem.addBody(test2Body);
+               subSystem.addBody(test3Body);
+               parentSystem.addBody(testBody);               
+               parentSystem.addBody(subSystem);
+               return parentSystem;
+            };
+
+            
+
+            var createReferenceGrid = function (BABYLON, scene, gridSize) {
+               var gridObjects = [];
+               var createGridBox = function (BABYLON, scene, origin) {
+                  var grid = BABYLON.Mesh.CreateLines("lines", [
+                     new BABYLON.Vector3(0,0,0),
+                     new BABYLON.Vector3(1,0,0),
+                     new BABYLON.Vector3(1,0,1),
+                     new BABYLON.Vector3(0,0,1),
+                     new BABYLON.Vector3(0,0,0)
+                  ], scene);
+                  grid.position.x = origin[0];
+                  grid.position.y = origin[1];
+                  grid.position.z = origin[2];
+                  return grid;
+               };
+               var gridSizeX = gridSize[0];
+               var gridSizeY = gridSize[1];
+               var gridBoundsX = gridSizeX/2;
+               var gridBoundsY = gridSizeY/2;
+               for(var x = (-1*gridBoundsX); x < gridBoundsX; x++) {
+                  for(var y = (-1*gridBoundsY); y < gridBoundsY; y++) {
+                     createGridBox(BABYLON,scene, [x, 0, y]);
+                  }
+               }
+               
+            };
+
+
+            var scene = createScene();
+            var frameCount = 0;
+            engine.runRenderLoop(function () {
+               //if(frameCount < 2) {
+                  //frameCount++;
+                  parentSystem.stepSimulation(1, 4);
+               //}
+               // Render the Scene
+               scene.render();
+               fpsElement.innerHTML = engine.getFps().toFixed() + "FPS";
+               //scaleElement.innerHTML = scale/au + "au";
+               simRatioOutput.innerHTML = engine.getFps().toFixed() + "x";
+               //engine.stopRenderLoop();
+            });
+
+            window.addEventListener("resize", function () {
+               engine.resize();
+            });
+
+            window.addEventListener("click", function () {
+               var pickResult = scene.pick(scene.pointerX, scene.pointerY);
+               //console.log(pickResult);
+            });
+
+            window.addEventListener("keydown", function (event) {
+               
+               var moveScale = scale/10;
+
+               console.log(event.keyCode);
+
+               switch(event.keyCode) {
+                  case 87 : {
+                     // W
+                     var x = cameraLocation[0] - moveScale;
+                     var y = cameraLocation[1];
+                     var z = cameraLocation[2];
+                     cameraLocation = vec3.fromValues(x,y,z);
+                  } break;
+                  case 65 : {
+                     // A
+                     var x = cameraLocation[0];
+                     var y = cameraLocation[1];
+                     var z = cameraLocation[2] - moveScale;
+                     cameraLocation = vec3.fromValues(x,y,z);
+                  } break;
+                  case 83 : {
+                     // S
+                     var x = cameraLocation[0] + moveScale;
+                     var y = cameraLocation[1];
+                     var z = cameraLocation[2];
+                     cameraLocation = vec3.fromValues(x,y,z);
+                  } break;
+                  case 68 : {
+                     // D
+                     var x = cameraLocation[0];
+                     var y = cameraLocation[1];
+                     var z = cameraLocation[2] + moveScale;
+                     cameraLocation = vec3.fromValues(x,y,z);
+                  } break;
+                  case 81 : {
+                     // Q
+                     var x = cameraLocation[0];
+                     var y = cameraLocation[1] - moveScale;
+                     var z = cameraLocation[2];
+                     cameraLocation = vec3.fromValues(x,y,z);
+                  } break;
+                  case 90 : {
+                     // Z
+                     var x = cameraLocation[0];
+                     var y = cameraLocation[1] + moveScale;
+                     var z = cameraLocation[2];
+                     cameraLocation = vec3.fromValues(x,y,z);
+                  } break;
+                  case 69 : {
+                     scaleFactor +=1;
+                     scale = au/(Math.pow(10,scaleFactor)/1);
+                  } break;
+                  case 67 : {
+                     scaleFactor -=1;
+                     scale = au/(Math.pow(10,scaleFactor)/1);
+                  } break;
+                  case 221 : {
+                     var cameraFocusObject = BallisticHawk.getBody(cameraFocusIndex + 1, "key");
+                     if(typeof cameraFocusObject != "undefined") { cameraFocusIndex += 1; }
+                     
+                  } break;
+                  case 219 : {
+                     var cameraFocusObject = BallisticHawk.getBody(cameraFocusIndex - 1, "key");
+                     if(typeof cameraFocusObject != "undefined") { cameraFocusIndex -= 1; }
+                  } break;
+                  case 187 : {simulationRatio += 1; if(simulationRatio > 1000) {simulationRatio = 1000;}} break;
+                  case 187 : {simulationRatio -= 1; if(simulationRatio < 1) {simulationRatio = 1;}} break;
+                  case 48 : {simulationRatio = 1; } break;
+                  case 49 : {simulationRatio = 10; } break;
+                  case 50 : {simulationRatio = 100; } break;
+                  case 51 : {simulationRatio = 250; } break;
+                  case 52 : {simulationRatio = 500; } break;
+                  case 53 : {simulationRatio = 600; } break;
+                  case 54 : {simulationRatio = 700; } break;
+                  case 55 : {simulationRatio = 800; } break;
+                  case 56 : {simulationRatio = 900; } break;
+                  case 57 : {simulationRatio = 1000; } break;
+
+               }
+            });
+   			
+   		</script>
+   </body>
+
+</html>

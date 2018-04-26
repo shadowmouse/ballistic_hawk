@@ -1,0 +1,19 @@
+{
+  "name": "ballistichawk",
+  "main": "index.js",
+  "version": "0.0.0",
+  "authors": [
+    "Elliot Francis <ef@windowlatch.org>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "numbers.js": "*"
+  }
+}
