@@ -18,3 +18,15 @@ In the demo you can pan and zoom using the mouse and scroll wheel. In the demo y
 * Javascript does not support the numerical precision to use m/s as the base unit for such a simulator due to the rapid drop off of numerical precision. As a result the base unit for the simulation is AU (astronomical units), or the distance from the earth to the sun.
 
 * Gravitational Effects are deliberately restricted to the local orbital system (EG. the gravity of the sun does not affect the orbit of the moon, only the orbit of the combined earth/moon system). This is to reduce computational complexity and avoid the issues associated with solving the n-body problem. For most static cases (and the intended use case) this was determined to be an acceptable compromise given that this is an attempt at a game engine, not a completely accurate physics simulator.
+
+
+## Dependencies
+
+All dependencies can be found in the js/ sub folder of the repo
+
+* Babylon 2.1
+* Cannon.js
+* gl-matrix-64.js
+* HandJS
+* OimoPhysics
+* Poly2Tri
