@@ -1,2 +1,5 @@
+# Ignore System Files
+.DS_Store
+
 #Ignore Downloaded Library Components
 /bower_components
