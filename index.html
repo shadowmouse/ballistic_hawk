@@ -3,7 +3,7 @@
 
    <head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-		<title>Babylon - Basic scene</title>
+		<title>Ballistic Hawk v0.2</title>
 		<style>
 			html, body {
 				overflow: hidden;
@@ -42,12 +42,12 @@
    		<div class="debug-output">
    			<span style="color: green; text-decoration: underline;"> Debug Output </span>
    			<div>
-   				<span id="xPosOutput" style="color: #941100"></span> 
-   				<span id="yPosOutput" style="color: green"></span> 
-   				<span id="zPosOutput" style="color: blue"></span> 
+   				<span id="xPosOutput" style="color: #941100"></span>
+   				<span id="yPosOutput" style="color: green"></span>
+   				<span id="zPosOutput" style="color: blue"></span>
    				<span id="distOutput" style="color: white"></span>
-               (<span id="fpsOutput" style="color: #941100"></span> 
-               <span id="scaleOutput" style="color: green"></span> 
+               (<span id="fpsOutput" style="color: #941100"></span>
+               <span id="scaleOutput" style="color: green"></span>
                <span id="simRatioOutput" style="color: blue"></span>)
    			</div>
             <span style="color: green; text-decoration: underline;"> Controls </span>
@@ -133,7 +133,7 @@
 
                var parentSystem = BallisticHawk.createSystem();
                var subSystem = BallisticHawk.createSystem();
-               
+
                parentSystem.set('position',vec3.fromValues(0,0,0));
                subSystem.set('position',vec3.fromValues(0,0,10));
                parentSystem.set('name',"parentSystem");
@@ -143,7 +143,7 @@
                var testBody = BallisticHawk.createBody({name: "tb1", radius  : 2, mass : 1000000, position: vec3.fromValues(0,0,0), isFixed: true});
                var test2Body = BallisticHawk.createBody({name: "tb2", radius  : 1, mass : 1000000, position: vec3.fromValues(0,0,0)});
                var test3Body = BallisticHawk.createBody({name: "tb3", radius  : 0.5, mass : 1, position: vec3.fromValues(2,0,0)});
-               
+
                var renderObject = BABYLON.Mesh.CreateSphere(testBody.name, 16, testBody.radius, scene);
                var render2Object = BABYLON.Mesh.CreateSphere(test2Body.name, 16, test2Body.radius, scene);
                var render3Object = BABYLON.Mesh.CreateSphere(test2Body.name, 16, test3Body.radius, scene);
@@ -164,12 +164,12 @@
                subSystem.set('renderUpdateFunction',renderUpdateFunction);
                subSystem.addBody(test2Body);
                subSystem.addBody(test3Body);
-               parentSystem.addBody(testBody);               
+               parentSystem.addBody(testBody);
                parentSystem.addBody(subSystem);
                return parentSystem;
             };
 
-            
+
 
             var createReferenceGrid = function (BABYLON, scene, gridSize) {
                var gridObjects = [];
@@ -195,7 +195,7 @@
                      createGridBox(BABYLON,scene, [x, 0, y]);
                   }
                }
-               
+
             };
 
 
@@ -224,7 +224,7 @@
             });
 
             window.addEventListener("keydown", function (event) {
-               
+
                var moveScale = scale/10;
 
                console.log(event.keyCode);
@@ -283,7 +283,7 @@
                   case 221 : {
                      var cameraFocusObject = BallisticHawk.getBody(cameraFocusIndex + 1, "key");
                      if(typeof cameraFocusObject != "undefined") { cameraFocusIndex += 1; }
-                     
+
                   } break;
                   case 219 : {
                      var cameraFocusObject = BallisticHawk.getBody(cameraFocusIndex - 1, "key");
@@ -304,7 +304,7 @@
 
                }
             });
-   			
+
    		</script>
    </body>
 
